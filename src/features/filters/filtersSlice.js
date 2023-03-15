@@ -1,3 +1,9 @@
+export const StatusFilters = {
+  All: 'all',
+  Active: 'active',
+  Completed: 'completed',
+}
+
 // Joe note: the initialState and reducers just return the object that will
 // contain the filters state. (They naturally don't need to return an
 // object with a filters: property whose value is an object...)

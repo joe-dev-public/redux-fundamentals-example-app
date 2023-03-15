@@ -1,18 +1,26 @@
-/*
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
 import './index.css'
 import App from './App'
 
 import './api/server'
+import store from './store'
 
 ReactDOM.render(
+  // Render a `<Provider>` around the entire `<App>`,
+  // and pass the Redux store to as a prop
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 )
-*/
+
+
+// Joe note: below can be uncommented to test Redux logic without React/UI.
+/*
 
 // Omit existing React imports
 // Omit existing React rendering logic
@@ -66,3 +74,5 @@ unsubscribe()
 // in which case this will log "Hi!".
 // When you have DevTools though, you'll be able to see this dispatch there.
 store.dispatch({ type: 'todos/todoAdded', payload: 'Try creating a store' })
+
+*/
