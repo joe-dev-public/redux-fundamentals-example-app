@@ -49,5 +49,5 @@ store.dispatch({
 unsubscribe()
 
 // Dispatch one more action to see what happens
-
+// Joe note: nothing. No log. Silence.
 store.dispatch({ type: 'todos/todoAdded', payload: 'Try creating a store' })
