@@ -16,6 +16,7 @@ export default function todosReducer(state = initialState, action) {
 
   switch (action.type) {
 
+    // {type: 'todos/todoAdded', payload: todoText}
     case 'todos/todoAdded': {
       // Can return just the new todos array - no extra object around it
       return [
@@ -29,15 +30,17 @@ export default function todosReducer(state = initialState, action) {
     }
 
     // Joe todo: fix this broken code :¬)
+    // {type: 'todos/todoToggled', payload: todoId}
     case 'todos/todoToggled': {
-      return [
-        ...state,
-        {
-          id: state[action.payload].id,
-          text: state[action.payload].text,
-          completed: !state[action.payload].completed,
-        },
-      ]
+      return state.map((todo) => {
+        if (todo.id === action.payload) {
+          return {
+            ...todo,
+            completed: !todo.completed,
+          }
+        }
+        return todo
+      })
     }
 
     // {type: 'todos/colorSelected', payload: {todoId, color}}
