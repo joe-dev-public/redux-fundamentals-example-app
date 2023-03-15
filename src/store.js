@@ -1,5 +1,8 @@
-import { createStore } from "redux";
+import { compose, createStore } from "redux";
 import rootReducer from "./reducer";
+
+// Joe note: enhancers:
+import { sayHiOnDispatch, includeMeaningOfLife } from './exampleAddons/enhancers'
 
 // let preloadedState
 // const persistedTodosString = localStorage.getItem('todos')
@@ -12,6 +15,14 @@ import rootReducer from "./reducer";
 
 // const store = createStore(rootReducer, preloadedState)
 
-const store = createStore(rootReducer)
+// Joe note: regular store:
+// const store = createStore(rootReducer)
+
+// Joe note: enhanced store, one enhancer only/"uncomposed":
+// const store = createStore(rootReducer, undefined, sayHiOnDispatch)
+
+// Joe note: store with composed enhancer ("many enhancers in one"):
+const composedEnhancer = compose(sayHiOnDispatch, includeMeaningOfLife)
+const store = createStore(rootReducer, undefined, composedEnhancer)
 
 export default store

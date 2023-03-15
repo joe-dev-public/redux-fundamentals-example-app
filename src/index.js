@@ -49,5 +49,6 @@ store.dispatch({
 unsubscribe()
 
 // Dispatch one more action to see what happens
-// Joe note: nothing. No log. Silence.
+// Joe note: nothing will happen, unless you have the sayHi enhancer enabled,
+// in which case this will log "Hi!".
 store.dispatch({ type: 'todos/todoAdded', payload: 'Try creating a store' })
