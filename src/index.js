@@ -62,6 +62,7 @@ store.dispatch({
 unsubscribe()
 
 // Dispatch one more action to see what happens
-// Joe note: nothing will happen, unless you have the sayHi enhancer enabled,
+// Joe note: nothing will log, unless you have the sayHi enhancer enabled,
 // in which case this will log "Hi!".
+// When you have DevTools though, you'll be able to see this dispatch there.
 store.dispatch({ type: 'todos/todoAdded', payload: 'Try creating a store' })
