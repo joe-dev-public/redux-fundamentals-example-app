@@ -29,7 +29,8 @@ export default function todosReducer(state = initialState, action) {
       ]
     }
 
-    // Joe todo: fix this broken code :¬)
+    // Joe todo: compare my code below to tutorial's.
+    // https://redux.js.org/tutorials/fundamentals/part-3-state-actions-reducers#handling-additional-actions
     // {type: 'todos/todoToggled', payload: todoId}
     case 'todos/todoToggled': {
       return state.map((todo) => {
@@ -45,13 +46,15 @@ export default function todosReducer(state = initialState, action) {
 
     // {type: 'todos/colorSelected', payload: {todoId, color}}
     case 'todos/colorSelected': {
-      return [
-        ...state,
-        {
-          ...state[action.payload.todoId],
-          color: action.payload.color,
-        },
-      ]
+      return state.map((todo) => {
+        if (todo.id === action.payload.todoId) {
+          return {
+            ...todo,
+            color: action.payload.color,
+          }
+        }
+        return todo
+      })
     }
 
     // Joe note: assume delete just deletes, rather than setting a flag
