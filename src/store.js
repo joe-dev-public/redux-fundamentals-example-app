@@ -1,4 +1,5 @@
 import { applyMiddleware, compose, createStore } from "redux"
+import thunkMiddleware from "redux-thunk"
 import { composeWithDevTools } from 'redux-devtools-extension'
 import rootReducer from "./reducer"
 
@@ -75,14 +76,20 @@ import {
 // )
 
 // Joe note: testing "async function middleware"
-const composedEnhancer = composeWithDevTools(
-  applyMiddleware(loggerMiddleware, asyncFunctionMiddleware)
-)
+// const composedEnhancer = composeWithDevTools(
+//   applyMiddleware(loggerMiddleware, asyncFunctionMiddleware)
+// )
 
 // Joe note: I'm going to leave this like this for now:
 // const composedEnhancer = composeWithDevTools(
 //   applyMiddleware(loggerMiddleware, alwaysReturnHelloMiddleware, delayedMessageMiddleware)
 // )
+
+// Joe note: thunk middleware:
+// The store now has the ability to accept thunk functions in `dispatch`
+const composedEnhancer = composeWithDevTools(
+  applyMiddleware(loggerMiddleware, thunkMiddleware)
+)
 
 // Joe note: 2nd param (preloadedState) is optional and can be omitted:
 const store = createStore(rootReducer, composedEnhancer)

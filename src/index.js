@@ -7,6 +7,12 @@ import App from './App'
 import './api/server'
 import store from './store'
 
+// Joe note: thunk stuff:
+import { fetchTodos } from './features/todos/todosSlice'
+store.dispatch(fetchTodos)
+
+// Joe note: this is synchronous, so won't definitely contain the data that's
+// async loaded by the above (unless it just happens to load before this runs).
 console.log('Initial state: ', store.getState())
 
 ReactDOM.render(
