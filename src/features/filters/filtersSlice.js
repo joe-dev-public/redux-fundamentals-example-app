@@ -9,7 +9,7 @@ export const StatusFilters = {
 // object with a filters: property whose value is an object...)
 
 const initialState = {
-  status: 'All',
+  status: 'all',
   colors: [],
 }
 

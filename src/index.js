@@ -7,6 +7,8 @@ import App from './App'
 import './api/server'
 import store from './store'
 
+console.log('Initial state: ', store.getState())
+
 ReactDOM.render(
   // Render a `<Provider>` around the entire `<App>`,
   // and pass the Redux store to as a prop
