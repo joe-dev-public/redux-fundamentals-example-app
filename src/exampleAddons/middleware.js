@@ -104,7 +104,12 @@ export function asyncFunctionMiddleware(storeAPI) {
         // API methods.) https://redux.js.org/api/store#store-methods-1
         // Importantly: while it can be said we call the function here, the
         // *result* of that call is what this innermost function (handleAction)
-        // actually *returns*. (Consider:
+        // actually *returns*.
+        // Admittedly, for the moment, I'm not entirely sure of the
+        // implications of *returning* from middleware like this, except in the
+        // obvious case of "return next(action)" below. I've probably just
+        // forgotten/need to build up my intuition about it/see some better
+        // real-world examples of how middleware can be used. (Consider:
         // https://redux.js.org/tutorials/fundamentals/part-4-store#writing-custom-middleware)
       }
       return next(action)
