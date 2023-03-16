@@ -105,12 +105,31 @@ const Footer = () => {
     dispatch({ type: 'todos/completedCleared' })
   }
 
+  // Joe note: "async function middleware" example. (I've changed the
+  // tutorial example a fair bit.) What's key: this function has "dispatch"
+  // and "getState" as arguments. (It doesn't do anything useful with latter.)
+  const someAsyncFunction = (dispatch, getState) => {
+    return setTimeout(() => {
+      dispatch({ type: 'todos/allCompleted' })
+      console.log(
+        'getState after dispatch',
+        getState().todos.map(({completed}) => completed)
+      )
+    }, 1500)
+  }
+
+  const handleAsyncAllComplete = () => {
+    // Joe note: the crux: passing a FUNCTION (of all things!) to dispatch.
+    dispatch(someAsyncFunction)
+  }
+
   return (
     <footer className="footer">
       <div className="actions">
         <h5>Actions</h5>
         <button className="button" onClick={handleMarkAllCompleted}>Mark All Completed</button>
         <button className="button" onClick={handleClearCompleted}>Clear Completed</button>
+        <button className="button" onClick={handleAsyncAllComplete}>Async all complete</button>
       </div>
 
       <RemainingTodos count={todosRemaining} />

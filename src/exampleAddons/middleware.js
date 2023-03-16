@@ -54,3 +54,46 @@ export const delayedMessageMiddleware = storeAPI => next => action => {
 
   return next(action)
 }
+
+// Joe note: example async middleware with function "in place" (similar to
+// above). Note this only delays adding a todo item.
+export const delayedActionMiddleware = storeAPI => next => action => {
+  if (action.type === 'todos/todoAdded') {
+    setTimeout(() => {
+      // Delay this action by one second
+      next(action)
+    }, 1000)
+    return
+  }
+
+  return next(action)
+}
+
+// Joe note: "async function middleware", as an "improvement" on the above
+// (because it lets us write async logic separately from/in advance of the
+// middleware specifics?).
+// export const asyncFunctionMiddleware = storeAPI => next => action => {
+//   // If the "action" is actually a function instead...
+//   if (typeof action === 'function') {
+//     // then call the function and pass `dispatch` and `getState` as arguments
+//     return action(storeAPI.dispatch, storeAPI.getState)
+//   }
+
+//   // Otherwise, it's a normal action - send it onwards
+//   return next(action)
+// }
+
+// Joe note: rewriting above in verbose (ES5) functions, using
+// conventional middleware function names:
+export function asyncFunctionMiddleware(storeAPI) {
+  return function wrapDispatch(next) {
+    return function handleAction(action) {
+      if (typeof action === 'function') {
+        // Joe note: naturally, the parameter variables from all "ancestor"
+        // (enclosing) scopes are available here:
+        return action(storeAPI.dispatch, storeAPI.getState)
+      }
+      return next(action)
+    }
+  }
+}

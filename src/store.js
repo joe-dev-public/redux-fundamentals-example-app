@@ -6,7 +6,16 @@ import rootReducer from "./reducer"
 import { sayHiOnDispatch, includeMeaningOfLife } from './exampleAddons/enhancers'
 
 // Joe note: middleware:
-import { print1, print2, print3, loggerMiddleware, alwaysReturnHelloMiddleware, delayedMessageMiddleware } from './exampleAddons/middleware'
+import {
+  print1,
+  print2,
+  print3,
+  loggerMiddleware,
+  alwaysReturnHelloMiddleware,
+  delayedMessageMiddleware,
+  delayedActionMiddleware,
+  asyncFunctionMiddleware,
+} from './exampleAddons/middleware'
 
 // let preloadedState
 // const persistedTodosString = localStorage.getItem('todos')
@@ -59,10 +68,21 @@ import { print1, print2, print3, loggerMiddleware, alwaysReturnHelloMiddleware, 
 //   includeMeaningOfLife
 // )
 
-// Joe note: I'm going to leave this like this for now:
+// Joe note: testing example async middleware with functions "in place" (will
+// delay adding a todo item only)
+// const composedEnhancer = composeWithDevTools(
+//   applyMiddleware(loggerMiddleware, delayedActionMiddleware)
+// )
+
+// Joe note: testing "async function middleware"
 const composedEnhancer = composeWithDevTools(
-  applyMiddleware(loggerMiddleware, alwaysReturnHelloMiddleware, delayedMessageMiddleware)
+  applyMiddleware(loggerMiddleware, asyncFunctionMiddleware)
 )
+
+// Joe note: I'm going to leave this like this for now:
+// const composedEnhancer = composeWithDevTools(
+//   applyMiddleware(loggerMiddleware, alwaysReturnHelloMiddleware, delayedMessageMiddleware)
+// )
 
 // Joe note: 2nd param (preloadedState) is optional and can be omitted:
 const store = createStore(rootReducer, composedEnhancer)
