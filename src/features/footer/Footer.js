@@ -91,10 +91,12 @@ const Footer = () => {
     console.log('Color change: ', { color, changeType })
   const onStatusChange = (status) => console.log('Status change: ', status)
 
-
-
   const handleMarkAllCompleted = () => {
     dispatch({ type: 'todos/allCompleted' })
+  }
+
+  const handleClearCompleted = () => {
+    dispatch({ type: 'todos/completedCleared' })
   }
 
   return (
@@ -102,7 +104,7 @@ const Footer = () => {
       <div className="actions">
         <h5>Actions</h5>
         <button className="button" onClick={handleMarkAllCompleted}>Mark All Completed</button>
-        <button className="button">Clear Completed</button>
+        <button className="button" onClick={handleClearCompleted}>Clear Completed</button>
       </div>
 
       <RemainingTodos count={todosRemaining} />

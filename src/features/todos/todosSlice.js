@@ -73,10 +73,11 @@ export default function todosReducer(state = initialState, action) {
       })
     }
 
+    // Joe note: I assume the point of this is to delete completed ones...
     // {type: 'todos/completedCleared'}
-    // case 'todos/completedCleared': {
-
-    // }
+    case 'todos/completedCleared': {
+      return state.filter(({completed}) => completed !== true)
+    }
 
     default:
       return state
