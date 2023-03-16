@@ -117,10 +117,20 @@ const Footer = () => {
       )
     }, 1500)
   }
+  // Joe note: clarifying basic JS stuff: the function definition above
+  // takes two params. They're "filled in" when this function is ultimately
+  // called in middleware.js (with Redux's built-in store API methods).
 
   const handleAsyncAllComplete = () => {
     // Joe note: the crux: passing a FUNCTION (of all things!) to dispatch.
     dispatch(someAsyncFunction)
+
+    // Joe note: just to clarify some basic JS stuff that I still(!) confuse
+    // myself about: here we are calling "dispatch" and giving it one param,
+    // which is the function someAsyncFunction. (Or possibly, technically, a/
+    // the reference to this function. Still haven't fully clarified refs etc.
+    // but that's OK for now.) Importantly: we are *not* calling someAsyncFn
+    // here.
   }
 
   return (

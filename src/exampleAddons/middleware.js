@@ -92,6 +92,20 @@ export function asyncFunctionMiddleware(storeAPI) {
         // Joe note: naturally, the parameter variables from all "ancestor"
         // (enclosing) scopes are available here:
         return action(storeAPI.dispatch, storeAPI.getState)
+        // Joe note: just clarifying some basic JS stuff, in case it's not
+        // abundantly clear already. "action" is a parameter (part of the
+        // built-in-to-Redux pattern of how middleware is written) which
+        // contains the.. wait for it.. action that was dispatched.
+        // In this case, we're dispatching a function, so of course we can
+        // *call* it. And that's what happens here: this is where we actually
+        // call the function. The function, as defined in Footer.js, takes
+        // two params, and those get passed in here. (The params happen to come
+        // from an "enclosing" scope; they're two of Redux's built-in store
+        // API methods.) https://redux.js.org/api/store#store-methods-1
+        // Importantly: while it can be said we call the function here, the
+        // *result* of that call is what this innermost function (handleAction)
+        // actually *returns*. (Consider:
+        // https://redux.js.org/tutorials/fundamentals/part-4-store#writing-custom-middleware)
       }
       return next(action)
     }
