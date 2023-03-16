@@ -35,7 +35,8 @@ const TodoListItem = ({ id }) => {
   }
 
   const onDelete = () => {
-    console.log("onDelete")
+    // console.log("onDelete")
+    dispatch({ type: 'todos/todoDeleted', payload: todo.id })
   }
 
   const colorOptions = availableColors.map((c) => (

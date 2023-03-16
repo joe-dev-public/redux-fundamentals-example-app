@@ -60,7 +60,7 @@ export default function todosReducer(state = initialState, action) {
     // Joe note: assume delete just deletes, rather than setting a flag
     // {type: 'todos/todoDeleted', payload: todoId}
     case 'todos/todoDeleted': {
-      return state.filter(({id}) => id !== action.payload.todoId)
+      return state.filter(({id}) => id !== action.payload)
     }
 
     // {type: 'todos/allCompleted'}
