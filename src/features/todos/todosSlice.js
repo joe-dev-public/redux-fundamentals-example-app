@@ -99,6 +99,16 @@ export default function todosReducer(state = initialState, action) {
 
 }
 
+
+// Joe note: action creator for todosLoaded. (Guessed this before checking
+// tutorial code, it's trivial.)
+const todosLoaded = todos => {
+  return {
+    type: 'todos/todosLoaded',
+    payload: todos
+  }
+}
+
 // Thunk function
 export async function fetchTodos(dispatch, getState) {
   const response = await client.get('/fakeApi/todos')
@@ -106,14 +116,24 @@ export async function fetchTodos(dispatch, getState) {
   const stateBefore = getState()
   console.log('Todos before dispatch: ', stateBefore.todos.length)
 
-  dispatch({ type: 'todos/todosLoaded', payload: response.todos })
+  // Joe note: use an action creator instead
+  // dispatch({ type: 'todos/todosLoaded', payload: response.todos })
+  dispatch(todosLoaded(response.todos))
 
   const stateAfter = getState()
   console.log('Todos after dispatch: ', stateAfter.todos.length)
 }
 
 
-// Joe note: I think this function is an e.g. of the "action creator" pattern.
+// Joe note: guessing this action creator before checking tutorial code:
+const todoAdded = todo => {
+  return {
+    type: 'todos/todoAdded',
+    payload: todo
+  }
+}
+
+// Joe note: I think this function is an e.g. of the "action creator" pattern?
 // https://redux.js.org/tutorials/fundamentals/part-6-async-logic#saving-todo-items
 
 // Write a synchronous outer function that receives the `text` parameter:
@@ -129,7 +149,7 @@ export function saveNewTodo(text) {
     // of the newly saved todo item ..."
     const response = await client.post('/fakeApi/todos', { todo: initialTodo })
     // "... and then dispatch an action with that todo item":
-    dispatch({ type: 'todos/todoAdded', payload: response.todo })
+    dispatch(todoAdded(response.todo))
     // Which they haven't justified, but I assume is a broader web app pattern
     // re using an API like this. (Similar to how you might ask a DB query to
     // return a result, and use that, rather than just using the data that was
