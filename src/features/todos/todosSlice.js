@@ -1,3 +1,6 @@
+import { createSelector } from 'reselect'
+import { StatusFilters } from '../filters/filtersSlice'
+
 import { client } from '../../api/client'
 
 const initialState = []
@@ -156,3 +159,98 @@ export function saveNewTodo(text) {
     // sent to the DB.)
   }
 }
+
+export const selectTodoIds = createSelector(
+  // First, pass one or more "input selector" functions:
+  state => state.todos,
+  (state, somethingElse) => {
+    console.log('state', state)
+    console.log('somethingElse', somethingElse)
+  },
+  // Then, an "output selector" that receives all the input results as arguments
+  // and returns a final result value
+  todos => todos.map(todo => todo.id)
+)
+
+// Joe note: attempting to write this without checking tutorial code:
+export const mySelectFilteredTodoIds = createSelector(
+  // First input selector: all the todos:
+  state => state.todos,
+  // Second input selector: the selected status filter:
+  state => state.filters.status,
+  // Output selector: the filtered list of todos:
+  (todos, status) => {
+    if (status === "active") {
+      return todos.map(todo => {
+        if (todo.completed === false) {
+          return todo.id
+        }
+      // Joe note: basic JS stuff, but don't forget: Array.map will return
+      // undefined for an element that doesn't return anything. It won't just
+      // "skip" that element! One workaround is filtering before/after the map.
+      }).filter(element => element !== undefined)
+    }
+    if (status === "completed") {
+      return todos.map(todo => {
+        if (todo.completed === true) {
+          return todo.id
+        }
+      }).filter(element => element !== undefined)
+    }
+    // All:
+    return todos.map(todo => todo.id)
+  }
+)
+
+// Joe note: above works, but the tutorial's approach is also interesting
+// because it demonstrates another couple of ideas:
+// (1) Use of "multiple selectors in a row" to build one up (see below).
+// (2) Awareness of cyclic import dependencies. Standard JS thing, but maybe
+// particularly likely in a Redux-y context?
+
+export const selectFilteredTodos = createSelector(
+  // First input selector: all todos
+  state => state.todos,
+  // Second input selector: current status filter
+  // state => state.filters.status,
+
+  // Second input selector: all filter values
+  state => state.filters,
+
+  // Output selector: receives both values
+  // (todos, status) => {
+  //   if (status === StatusFilters.All) {
+  //     return todos
+  //   }
+  //
+  //   const completedStatus = status === StatusFilters.Completed
+  //   // Return either active or completed todos based on filter
+  //   return todos.filter(todo => todo.completed === completedStatus)
+  // }
+
+  (todos, filters) => {
+    const { status, colors } = filters
+    const showAllCompletions = status === StatusFilters.All
+    if (showAllCompletions && colors.length === 0) {
+      return todos
+    }
+
+    const completedStatus = status === StatusFilters.Completed
+    // Return either active or completed todos based on filter
+    return todos.filter(todo => {
+      const statusMatches =
+        showAllCompletions || todo.completed === completedStatus
+      const colorMatches = colors.length === 0 || colors.includes(todo.color)
+      return statusMatches && colorMatches
+    })
+  }
+)
+
+export const selectFilteredTodoIds = createSelector(
+  // Joe note: here's point (1) from above: this selector essentially "calls"
+  // another one. More modular, init!
+  // Pass our other memoized selector as an input
+  selectFilteredTodos,
+  // And derive data in the output selector
+  filteredTodos => filteredTodos.map(todo => todo.id)
+)
