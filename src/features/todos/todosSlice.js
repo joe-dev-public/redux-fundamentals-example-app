@@ -9,10 +9,10 @@ const initialState = []
 //   { id: 2, text: 'Build something fun!', completed: false, color: 'blue' }
 // ]
 
-function nextTodoId(todos) {
-  const maxId = todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1)
-  return maxId + 1
-}
+// function nextTodoId(todos) {
+//   const maxId = todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1)
+//   return maxId + 1
+// }
 
 export default function todosReducer(state = initialState, action) {
 
@@ -23,11 +23,16 @@ export default function todosReducer(state = initialState, action) {
       // Can return just the new todos array - no extra object around it
       return [
         ...state,
-        {
-          id: nextTodoId(state),
-          text: action.payload,
-          completed: false
-        }
+        // Joe note: if using fake API, the payload it returns is a whole new
+        // todo item, so we can just add that:
+        action.payload,
+        // Joe note: if using the non-API version, this code is needed to add
+        // a new item:
+        // {
+        //   id: nextTodoId(state),
+        //   text: action.payload,
+        //   completed: false
+        // }
       ]
     }
 
@@ -105,4 +110,29 @@ export async function fetchTodos(dispatch, getState) {
 
   const stateAfter = getState()
   console.log('Todos after dispatch: ', stateAfter.todos.length)
+}
+
+
+// Joe note: I think this function is an e.g. of the "action creator" pattern.
+// https://redux.js.org/tutorials/fundamentals/part-6-async-logic#saving-todo-items
+
+// Write a synchronous outer function that receives the `text` parameter:
+export function saveNewTodo(text) {
+  // And then creates and returns the async thunk function:
+  // (Joe note: this function is given a name here, but I think it could just
+  // as well be anonymous?)
+  return async function saveNewTodoThunk(dispatch, getState) {
+    // ✅ Now we can use the text value and send it to the server
+    const initialTodo = { text }
+    // Joe note: as the tutorial says, "we should make an API call to the
+    // server with the initial data, wait for the server to send back a copy
+    // of the newly saved todo item ..."
+    const response = await client.post('/fakeApi/todos', { todo: initialTodo })
+    // "... and then dispatch an action with that todo item":
+    dispatch({ type: 'todos/todoAdded', payload: response.todo })
+    // Which they haven't justified, but I assume is a broader web app pattern
+    // re using an API like this. (Similar to how you might ask a DB query to
+    // return a result, and use that, rather than just using the data that was
+    // sent to the DB.)
+  }
 }
