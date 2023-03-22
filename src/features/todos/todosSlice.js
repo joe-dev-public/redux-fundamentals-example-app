@@ -254,3 +254,113 @@ export const selectFilteredTodoIds = createSelector(
   // And derive data in the output selector
   filteredTodos => filteredTodos.map(todo => todo.id)
 )
+
+// Joe note: this is a copy of mySelectFilteredTodoIds above, but with extra
+// code added to interrogate how createSelector handles params (and the basic
+// JS business of passing functions and params around works, in detail). I've
+// also split the basic inputs out into separate functions (which is something
+// the tutorial wants us to do next in any case), to make the data flow of
+// params more obvious (and make logging easier).
+// (Remember: these input functions are just "regular JS functions" -- NOT some
+// instance of useSelector or createSelector!)
+const selectTodos = state => state.todos
+
+const myTestInput = (...params) => {
+  // Joe note: every input selector function gets the same params. I'm not
+  // sure of the clearest way to put it, but I wouldn't necessarily say that
+  // these are the params that we "call createSelector with". (I'd refer to
+  // the 1+ input functions and the 1 output function as such.)[1]
+  //
+  // Rather: createSelector returns[2] a selector function, and it's this
+  // *returned* function that we call with the params. (Hopefully that's
+  // correct? I believe createSelector is basically curried[3], so.. maybe
+  // this is really just a vague explanation of how params work with curried
+  // functions?)
+  //
+  // [1] Nevertheless, for "ease", I might sometimes say "the params we call
+  // createSelector with" when I mean the params that typically appear here:
+  // useSelector(state => someCreateSelectorFunction(state, these, params)
+  // [2] https://redux.js.org/usage/deriving-data-selectors#createselector-overview
+  // [3] https://github.com/reduxjs/reselect/issues/253#issuecomment-301572601
+  console.log('myTestInput params', params)
+}
+
+// function myTestInputCurried(...outerParams) {
+//   return function (...innerParams) {
+//     console.log('myTestInputCurried outerParams', outerParams)
+//     return myTestInput(innerParams)
+//   }
+// }
+
+const myTestInputCurried = (...outerParams) => (...innerParams) => {
+  console.log('myTestInputCurried outerParams', outerParams)
+  return myTestInput(innerParams)
+}
+
+function myTestInputCurriedES5(...outerParams) {
+  return function(...innerParams) {
+    console.log('myTestInputCurriedES5 outerParams', outerParams)
+    return myTestInput(innerParams)
+  }
+}
+
+function myTestInputCurriedES52(...outerParams) {
+  console.log('myTestInputCurriedES5 outerParams', outerParams)
+  return function(...innerParams) {
+    return myTestInput(innerParams)
+  }
+}
+
+export const mySelectFilteredTodoIdsExperiment = createSelector(
+  selectTodos,
+  state => state.filters.status,
+  // Supplying "bare reference" to function will call it with all params by
+  // default:
+  // myTestInput,
+  // Or we can pass just one param:
+  // state => myTestInput(state),
+  // Or a subset of all:
+  // (state, someString) => myTestInput(state, someString),
+  // Or explicitly pass all. (Note: order can be changed.)
+  // (state, someString, someNumber) => myTestInput(someNumber, state, someString),
+  // We can use a curried input function if we want to pass it params other
+  // than those that we call createSelector with (see [1] above!).
+  // Note also that because this function is curried and *only* returns a 
+  // function, we actually have to call (that returned function) it here (with
+  // or without extra params) -- not just include a reference to it. i.e.,
+  // this works (but is pretty pointless!):
+  // myTestInputCurried(),
+  // and so does this:
+  // myTestInputCurried('foo', 'bar'),
+  // But this doesn't:
+  // myTestInputCurried,
+  // Likewise for this ES5 equivalent:
+  // myTestInputCurriedES5(),
+  // There's also nothing to stop us from doing something silly like this:
+  // (state, someString, someNumber) => myTestInputCurriedES5('foo')(state),
+  // And of course if the curried function does something other than just
+  // return a function, we don't have to call it here to "use" it (but this
+  // means the returned function won't be called, so again, it's pretty
+  // pointless):
+  // myTestInputCurriedES52,
+  // Compare what that logs for outerParams compared to what and WHERE this
+  // logs:
+  // myTestInputCurriedES52('foo', 'bar', 'baz'),
+  (todos, status) => {
+    if (status === "active") {
+      return todos.map(todo => {
+        if (todo.completed === false) {
+          return todo.id
+        }
+      }).filter(element => element !== undefined)
+    }
+    if (status === "completed") {
+      return todos.map(todo => {
+        if (todo.completed === true) {
+          return todo.id
+        }
+      }).filter(element => element !== undefined)
+    }
+    return todos.map(todo => todo.id)
+  }
+)
