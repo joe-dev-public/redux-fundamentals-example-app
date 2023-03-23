@@ -9,7 +9,14 @@ import store from './store'
 
 // Joe note: thunk stuff:
 import { fetchTodos } from './features/todos/todosSlice'
-store.dispatch(fetchTodos)
+
+// Joe note: because we (pointlessly) wrapped fetchTodos in an action creator
+// (actually renaming the "inner" function fetchTodosThunk, and keeping the
+// name of the "outer" fuction as fetchTodos), we here need to "call the outer
+// thunk action creator function, and pass the returned inner thunk function
+// to dispatch".
+// (https://redux.js.org/tutorials/fundamentals/part-7-standard-patterns#using-action-creators)
+store.dispatch(fetchTodos())
 
 // Joe note: this is synchronous, so won't definitely contain the data that's
 // async loaded by the above (unless it just happens to load before this runs).

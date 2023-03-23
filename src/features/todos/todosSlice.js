@@ -113,7 +113,28 @@ const todosLoaded = todos => {
 }
 
 // Thunk function
-export async function fetchTodos(dispatch, getState) {
+// Joe note: "While fetchTodos doesn't take any parameters, we could still
+// wrap it in an action creator as well"
+// (https://redux.js.org/tutorials/fundamentals/part-7-standard-patterns#using-action-creators)
+// export function fetchTodos() {
+//   return async function fetchTodosThunk(dispatch, getState) {
+//     const response = await client.get('/fakeApi/todos')
+
+//     const stateBefore = getState()
+//     console.log('Todos before dispatch: ', stateBefore.todos.length)
+
+//     // Joe note: use an action creator instead
+//     // dispatch({ type: 'todos/todosLoaded', payload: response.todos })
+//     dispatch(todosLoaded(response.todos))
+
+//     const stateAfter = getState()
+//     console.log('Todos after dispatch: ', stateAfter.todos.length)
+//   }
+// }
+
+// Joe note: same as above but terser arrow function (tutorial omits getState
+// stuff/logging).
+export const fetchTodos = () => async (dispatch, getState) => {
   const response = await client.get('/fakeApi/todos')
 
   const stateBefore = getState()
@@ -129,12 +150,17 @@ export async function fetchTodos(dispatch, getState) {
 
 
 // Joe note: guessing this action creator before checking tutorial code:
-const todoAdded = todo => {
-  return {
-    type: 'todos/todoAdded',
-    payload: todo
-  }
-}
+// const todoAdded = todo => {
+//   return {
+//     type: 'todos/todoAdded',
+//     payload: todo
+//   }
+// }
+
+// Joe note: same as above but implicit return for terseness (also exported
+// for possibly no good reason, but just because tutorial code does this)
+export const todoAdded = todo => ({ type: 'todos/todoAdded', payload: todo })
+
 
 // Joe note: I think this function is an e.g. of the "action creator" pattern?
 // https://redux.js.org/tutorials/fundamentals/part-6-async-logic#saving-todo-items
