@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { availableColors, capitalize } from '../filters/colors'
 import { colorFilterChanged, StatusFilters } from '../filters/filtersSlice'
 
+import { selectTodos } from '../todos/todosSlice'
+
 const RemainingTodos = ({ count }) => {
   const suffix = count === 1 ? '' : 's'
 
@@ -81,7 +83,12 @@ const Footer = () => {
   // const todosRemaining = 1
 
   const todosRemaining = useSelector(state => {
-    const uncompletedTodos = state.todos.filter(todo => !todo.completed)
+    // Joe note: the tutorial didn't explicitly mention that this needed
+    // updating for the async request status stuff, but it does. More
+    // worrying is the fact that without updating this, the page "fails
+    // silently" -- it just renders nothing, and there are no useful errors
+    // or warnings in the console. This seems to be characteristic of Redux?
+    const uncompletedTodos = selectTodos(state).filter(todo => !todo.completed)
     return uncompletedTodos.length
   })
 

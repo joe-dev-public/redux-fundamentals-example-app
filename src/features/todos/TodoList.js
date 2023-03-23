@@ -73,6 +73,18 @@ const TodoList = () => {
   // const todoIds = useSelector((state, something) => mySelectFilteredTodoIdsExperiment(state, something))
 
 
+  const loadingStatus = useSelector(state => state.todos.status)
+
+  console.log('loadingStatus', loadingStatus)
+
+  if (loadingStatus === 'loading') {
+    return (
+      <div className="todo-list">
+        <div className="loader" />
+      </div>
+    )
+  }
+
     // since `todos` is an array, we can loop over it
   // const renderedListItems = todos.map(todo => {
   const renderedListItems = todoIds.map(todoId => {
