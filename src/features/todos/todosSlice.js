@@ -5,7 +5,7 @@ import { client } from '../../api/client'
 
 const initialState = {
   status: 'idle', // or: 'loading', 'succeeded', 'failed'
-  entities: [],
+  entities: {},
 }
 
 // Joe note: tutorial's placeholder data/default todos state:
@@ -24,100 +24,89 @@ export default function todosReducer(state = initialState, action) {
 
   switch (action.type) {
 
-    // {type: 'todos/todoAdded', payload: todoText}
     case 'todos/todoAdded': {
-      // Can return just the new todos array - no extra object around it
+      const todo = action.payload
       return {
         ...state,
-        // Joe note: if using fake API, the payload it returns is a whole new
-        // todo item, so we can just add that:
-        // action.payload,
-        // Joe note: changing structure to allow for async request status
-        entities: [...state.entities, action.payload],
-        // Joe note: if using the non-API version, this code is needed to add
-        // a new item:
-        // {
-        //   id: nextTodoId(state),
-        //   text: action.payload,
-        //   completed: false
-        // }
+        entities: {
+          ...state.entities,
+          [todo.id]: todo,
+        },
       }
     }
 
-    // Joe todo: compare my code below to tutorial's.
-    // https://redux.js.org/tutorials/fundamentals/part-3-state-actions-reducers#handling-additional-actions
     // {type: 'todos/todoToggled', payload: todoId}
     case 'todos/todoToggled': {
+      const todoId = action.payload
+      const todo = state.entities[todoId]
       return {
         ...state,
-        entities: state.entities.map((todo) => {
-          if (todo.id === action.payload) {
-            return {
-              ...todo,
-              completed: !todo.completed,
-            }
-          }
-          return todo
-        }),
+        entities: {
+          ...state.entities,
+          [todoId]: {
+            ...todo,
+            completed: !todo.completed,
+          },
+        },
       }
     }
 
     // {type: 'todos/colorSelected', payload: {todoId, color}}
     case 'todos/colorSelected': {
-      // Joe note: tutorial didn't explicitly say that this needs to be
-      // updated for the async request status stuff, but it does:
+      const { color, todoId } = action.payload
+      const todo = state.entities[todoId]
       return {
         ...state,
-        entities: state.entities.map((todo) => {
-          if (todo.id === action.payload.todoId) {
-            return {
-              ...todo,
-              color: action.payload.color,
-            }
-          }
-          return todo
-        }),
+        entities: {
+          ...state.entities,
+          [todoId]: {
+            ...todo,
+            color,
+          },
+        },
       }
     }
 
-    // Joe note: assume delete just deletes, rather than setting a flag
     // {type: 'todos/todoDeleted', payload: todoId}
     case 'todos/todoDeleted': {
-      // Joe note: tutorial didn't explicitly say that this needs to be
-      // updated for the async request status stuff, but it does:
+      const todoId = action.payload
+      const newEntities = { ...state.entities }
+      delete newEntities[todoId]
       return {
         ...state,
-        entities: state.entities.filter(({id}) => id !== action.payload),
+        entities: { ...newEntities },
       }
     }
 
     // {type: 'todos/allCompleted'}
     case 'todos/allCompleted': {
-      // Joe note: tutorial didn't explicitly say that this needs to be
-      // updated for the async request status stuff, but it does:
+      const newEntities = { ...state.entities }
+      // Joe note: I took a slightly different approach to tutorial; I think
+      // both are fine.
+      for (const todo in newEntities) {
+        newEntities[todo].completed = true
+      }
       return {
         ...state,
-        entities: state.entities.map((todo) => {
-          return {
-            ...todo,
-            completed: true,
-          }
-        }),
+        entities: { ...newEntities },
       }
     }
 
-    // Joe note: I assume the point of this is to delete completed ones...
+    // Joe note: i.e. delete completed todos. Bad naming!
     // {type: 'todos/completedCleared'}
     case 'todos/completedCleared': {
-      // Joe note: tutorial didn't explicitly say that this needs to be
-      // updated for the async request status stuff, but it does:
+      const newEntities = { ...state.entities }
+      for (const todo in newEntities) {
+        if (newEntities[todo].completed === true) {
+          delete newEntities[todo]
+        }
+      }
       return {
         ...state,
-        entities: state.entities.filter(({completed}) => completed !== true),
+        entities: { ...newEntities },
       }
     }
 
-    // Joe note: async request status stuff:
     case 'todos/todosLoading': {
       return {
         ...state,
@@ -125,15 +114,17 @@ export default function todosReducer(state = initialState, action) {
       }
     }
 
-    // Joe note: thunk stuff
+    // Joe note: don't forget this is the action that essentially loads all
+    // of the data we get from the (fake) API into state.
     case 'todos/todosLoaded': {
-      // Replace the existing state entirely by returning the new value
-      // return action.payload
-      // Joe note: changing structure for async request status:
+      const newEntities = {}
+      action.payload.forEach(todo => {
+        newEntities[todo.id] = todo
+      })
       return {
         ...state,
         status: 'idle',
-        entities: action.payload,
+        entities: newEntities,
       }
     }
 
@@ -282,7 +273,20 @@ export const mySelectFilteredTodoIds = createSelector(
 // (1) Use of "multiple selectors in a row" to build one up (see below).
 // (2) Awareness of cyclic import dependencies. Standard JS thing, but maybe
 // particularly likely in a Redux-y context?
-export const selectTodos = state => state.todos.entities
+
+// Joe note: updating for normalization
+// export const selectTodos = state => state.todos.entities
+
+const selectTodoEntities = state => state.todos.entities
+
+export const selectTodos = createSelector(selectTodoEntities, entities =>
+  Object.values(entities)
+)
+
+export const selectTodoById = (state, todoId) => {
+  return selectTodoEntities(state)[todoId]
+}
+
 
 export const selectFilteredTodos = createSelector(
   // First input selector: all todos
@@ -331,9 +335,9 @@ export const selectFilteredTodoIds = createSelector(
   filteredTodos => filteredTodos.map(todo => todo.id)
 )
 
-export const selectTodoById = (state, todoId) => {
-  return selectTodos(state).find(todo => todo.id === todoId)
-}
+// export const selectTodoById = (state, todoId) => {
+//   return selectTodos(state).find(todo => todo.id === todoId)
+// }
 
 
 // Joe note: this is a copy of mySelectFilteredTodoIds above, but with extra
