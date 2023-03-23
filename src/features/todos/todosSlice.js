@@ -233,10 +233,11 @@ export const mySelectFilteredTodoIds = createSelector(
 // (1) Use of "multiple selectors in a row" to build one up (see below).
 // (2) Awareness of cyclic import dependencies. Standard JS thing, but maybe
 // particularly likely in a Redux-y context?
+export const selectTodos = state => state.todos
 
 export const selectFilteredTodos = createSelector(
   // First input selector: all todos
-  state => state.todos,
+  selectTodos,
   // Second input selector: current status filter
   // state => state.filters.status,
 
@@ -281,6 +282,11 @@ export const selectFilteredTodoIds = createSelector(
   filteredTodos => filteredTodos.map(todo => todo.id)
 )
 
+export const selectTodoById = (state, todoId) => {
+  return selectTodos(state).find(todo => todo.id === todoId)
+}
+
+
 // Joe note: this is a copy of mySelectFilteredTodoIds above, but with extra
 // code added to interrogate how createSelector handles params (and the basic
 // JS business of passing functions and params around works, in detail). I've
@@ -289,7 +295,7 @@ export const selectFilteredTodoIds = createSelector(
 // params more obvious (and make logging easier).
 // (Remember: these input functions are just "regular JS functions" -- NOT some
 // instance of useSelector or createSelector!)
-const selectTodos = state => state.todos
+const mySelectTodos = state => state.todos
 
 const myTestInput = (...params) => {
   // Joe note: every input selector function gets the same params. I'm not
@@ -338,7 +344,7 @@ function myTestInputCurriedES52(...outerParams) {
 }
 
 export const mySelectFilteredTodoIdsExperiment = createSelector(
-  selectTodos,
+  mySelectTodos,
   state => state.filters.status,
   // Supplying "bare reference" to function will call it with all params by
   // default:
